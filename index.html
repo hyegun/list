@@ -153,22 +153,21 @@ Hapus
       async function simpanEdit() {
         try {
           const body = {
-            nama: nama.value,
-            jenisKelamin: jk.value,
-            noKTP: ktp.value,
-            tglLahir: tglLahir.value,
-            usia: usia.value,
-            noTelp: telp.value,
+            action: "updatePeserta",
+            nama: document.getElementById("nama").value,
+            jenisKelamin: document.getElementById("jk").value,
+            noKTP: document.getElementById("ktp").value,
+            tglLahir: document.getElementById("tglLahir").value,
+            usia: document.getElementById("usia").value,
+            noTelp: document.getElementById("telp").value,
           };
-
-          const res = await fetch(API + "?action=updatePeserta", {
+          const res = await fetch(API, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify(body),
           });
-
           const json = await res.json();
 
           if (json.status === "ok") {
