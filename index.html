@@ -81,8 +81,9 @@
       }
       .stat-card {
         background: var(--surface);
-        padding: 18px 20px;
+        padding: 14px 16px;
         border-right: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
       }
       .stat-card:last-child { border-right: none; }
       .stat-label {
@@ -100,7 +101,10 @@
       .stat-value.rose { color: var(--red); }
 
       /* ── MAIN CONTENT ── */
-      .main-wrap { padding: 20px 24px 32px; }
+      .main-wrap { padding: 12px 12px 32px; }
+
+      /* table scroll on mobile */
+      .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
       /* ── TABLE CARD ── */
       .table-card {
@@ -170,12 +174,13 @@
 
       /* search bar custom */
       .custom-search-wrap {
-        padding: 12px 18px;
+        padding: 10px 12px;
         border-bottom: 1px solid var(--border);
-        display: flex; align-items: center; gap: 10px;
+        display: flex; align-items: center; gap: 8px;
+        flex-wrap: wrap;
       }
       .custom-search {
-        position: relative; flex: 1;
+        position: relative; flex: 1; min-width: 160px;
       }
       .custom-search input {
         width: 100%; padding: 8px 12px 8px 34px;
@@ -300,11 +305,32 @@
       /* empty/loading */
       .loading-cell { text-align: center; color: var(--muted); padding: 32px !important; font-size: 13px; }
 
-      @media (max-width: 768px) {
+      @media (max-width: 640px) {
+        .top-bar { padding: 0 12px; height: auto; min-height: 52px; flex-wrap: wrap; gap: 8px; padding-top: 10px; padding-bottom: 10px; }
+        .top-bar h1 { font-size: 13px; }
+        .top-bar p { font-size: 10px; }
+        .btn-topbar { padding: 5px 10px; font-size: 11px; }
+
         .stat-grid { grid-template-columns: repeat(2, 1fr); }
-        .stat-card { border-bottom: 1px solid var(--border); }
-        .main-wrap { padding: 14px; }
-        .top-bar { padding: 0 14px; }
+        .stat-card:nth-child(2) { border-right: none; }
+        .stat-card:nth-child(3), .stat-card:nth-child(4) { border-bottom: none; }
+        .stat-value { font-size: 22px; }
+
+        .main-wrap { padding: 10px 10px 24px; }
+        .table-card-header { padding: 12px 12px; }
+        .dataTables_wrapper .dataTables_length { padding: 8px 12px 0; }
+        .dataTables_wrapper .dataTables_info { padding: 8px 12px; }
+        .dataTables_wrapper .dataTables_paginate { padding: 8px 12px; }
+
+        .custom-search-wrap { padding: 8px 10px; gap: 6px; }
+        .filter-select { flex: 1; min-width: 0; font-size: 11px; }
+
+        #tbl thead th { font-size: 9px; padding: 8px 8px !important; }
+        #tbl tbody td { padding: 8px 8px !important; font-size: 11px; }
+        .ktp-mono { font-size: 10px; }
+        .btn-act { padding: 4px 7px; font-size: 10px; }
+
+        .modal-dialog { margin: 8px; }
       }
     </style>
   </head>
@@ -312,13 +338,14 @@
 
     <!-- TOP BAR -->
     <div class="top-bar">
+      <div class="top-bar-icon">🏥</div>
       <div>
         <h1>Dashboard Data Peserta</h1>
         <p>Cek Kesehatan Darah · GBI Pasarkemis Rayon 3</p>
       </div>
       <div class="ms-auto">
         <button class="btn-topbar" onclick="loadData()" id="btn-refresh">
-          🔄 refresh
+          🔄 Muat Ulang
         </button>
       </div>
     </div>
@@ -418,6 +445,7 @@
           </select>
         </div>
 
+        <div class="table-scroll">
         <table id="tbl" class="table table-striped table-bordered w-100">
           <thead>
             <tr>
@@ -439,6 +467,7 @@
             <tr><td colspan="12" class="loading-cell">⏳ Memuat data…</td></tr>
           </tbody>
         </table>
+        </div>
       </div>
     </div>
 
