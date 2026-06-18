@@ -413,9 +413,7 @@
               <th>Aksi</th>
             </tr>
           </thead>
-          <tbody>
-            <tr><td colspan="12" class="loading-cell">⏳ Memuat data…</td></tr>
-          </tbody>
+          <tbody></tbody>
         </table>
         </div>
       </div>
@@ -430,68 +428,35 @@
       const API = "https://script.google.com/macros/s/AKfycbylOYVEZRwqeOWQcDKPjeFgIHDB6Twt4iu-RBugr2BW9frFONyY6n2ij5VqDt3QVb-1/exec";
 
       let rawData = [];
+      let dt = null;
 
-      async function loadData() {
-        const btn = document.getElementById('btn-refresh');
-        btn.textContent = '⏳ Memuat…';
-        btn.disabled = true;
-
-        try {
-          const res = await fetch(API + "?action=listPeserta");
-          const j = await res.json();
-          rawData = j.data || [];
-        } catch(e) {
-          rawData = [];
-        }
-
-        updateStats();
-        buildTable(rawData);
-
-        btn.textContent = '🔄 Muat Ulang';
-        btn.disabled = false;
+      function rowHtml(r) {
+        const isLaki = (r.jenisKelamin||'').toLowerCase().includes('laki');
+        const isHadir = (r.statusHadir||'').toLowerCase().includes('hadir');
+        return [
+          r.noUrut,
+          `<span style="font-weight:500">${r.nama}</span>`,
+          `<span class="badge-jk ${isLaki ? 'laki' : 'perempuan'}">${r.jenisKelamin}</span>`,
+          `<span class="ktp-mono">${r.noKTP}</span>`,
+          `<span style="color:#64748b;font-size:11px">${r.tglLahir}</span>`,
+          r.usia,
+          `<span style="color:#64748b;font-size:11px">${r.noTelp}</span>`,
+          `<span style="color:#64748b;font-size:11px">${r.tglDaftar}</span>`,
+          r.statusHadir ? `<span class="badge-hadir ${isHadir ? 'ya' : 'belum'}">${r.statusHadir}</span>` : '<span style="color:#94a3b8;font-size:11px">—</span>',
+          r.noAntri ? `<span class="antri-badge">${r.noAntri}</span>` : '<span style="color:#94a3b8">—</span>',
+          r.statusAntri ? `<span style="font-size:11px;color:#64748b">${r.statusAntri}</span>` : '<span style="color:#94a3b8;font-size:11px">—</span>',
+          `<button class="btn-act hapus" onclick="hapusPeserta('${r.noKTP}')" style="margin-left:4px">🗑 Hapus</button>`
+        ];
       }
 
-      function updateStats() {
-        document.getElementById('stat-total').textContent = rawData.length;
-        document.getElementById('stat-hadir').textContent = rawData.filter(r => (r.statusHadir||'').toLowerCase().includes('hadir')).length;
-        document.getElementById('stat-laki').textContent = rawData.filter(r => (r.jenisKelamin||'').toLowerCase().includes('laki')).length;
-        document.getElementById('stat-perempuan').textContent = rawData.filter(r => (r.jenisKelamin||'').toLowerCase().includes('perempuan')).length;
-      }
-
-      function buildTable(data) {
-        if ($.fn.DataTable.isDataTable("#tbl")) {
-          $("#tbl").DataTable().destroy();
-        }
-
-        const tbody = document.querySelector("#tbl tbody");
-        tbody.innerHTML = "";
-
-        if (data.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="12" class="loading-cell">Tidak ada data ditemukan.</td></tr>';
-        } else {
-          data.forEach((r) => {
-            const isLaki = (r.jenisKelamin||'').toLowerCase().includes('laki');
-            const isHadir = (r.statusHadir||'').toLowerCase().includes('hadir');
-            tbody.innerHTML += `<tr>
-              <td>${r.noUrut}</td>
-              <td style="font-weight:500">${r.nama}</td>
-              <td><span class="badge-jk ${isLaki ? 'laki' : 'perempuan'}">${r.jenisKelamin}</span></td>
-              <td><span class="ktp-mono">${r.noKTP}</span></td>
-              <td style="color:#64748b;font-size:11px">${r.tglLahir}</td>
-              <td style="text-align:center">${r.usia}</td>
-              <td style="color:#64748b;font-size:11px">${r.noTelp}</td>
-              <td style="color:#64748b;font-size:11px">${r.tglDaftar}</td>
-              <td>${r.statusHadir ? `<span class="badge-hadir ${isHadir ? 'ya' : 'belum'}">${r.statusHadir}</span>` : '<span style="color:#94a3b8;font-size:11px">—</span>'}</td>
-              <td style="text-align:center">${r.noAntri ? `<span class="antri-badge">${r.noAntri}</span>` : '<span style="color:#94a3b8">—</span>'}</td>
-              <td>${r.statusAntri ? `<span style="font-size:11px;color:#64748b">${r.statusAntri}</span>` : '<span style="color:#94a3b8;font-size:11px">—</span>'}</td>
-              <td style="white-space:nowrap">
-                <button class="btn-act hapus" onclick="hapusPeserta('${r.noKTP}')" style="margin-left:4px">🗑 Hapus</button>
-              </td>
-            </tr>`;
-          });
-        }
-
-        const dt = new DataTable("#tbl", {
+      function initTable() {
+        dt = $('#tbl').DataTable({
+          data: [],
+          columns: [
+            { title: 'No' }, { title: 'Nama' }, { title: 'JK' }, { title: 'No KTP' },
+            { title: 'Tgl Lahir' }, { title: 'Usia' }, { title: 'Telp' }, { title: 'Tgl Daftar' },
+            { title: 'Hadir' }, { title: 'Antri' }, { title: 'Status' }, { title: 'Aksi' }
+          ],
           pageLength: 10,
           lengthMenu: [10, 25, 50, 100],
           language: {
@@ -501,17 +466,23 @@
             infoFiltered: "(difilter dari _MAX_ total)",
             paginate: { first: "«", last: "»", next: "›", previous: "‹" },
             emptyTable: "Tidak ada data.",
+            zeroRecords: "Tidak ada data ditemukan.",
           },
-          columnDefs: [{ orderable: false, targets: 11 }],
+          columnDefs: [{ orderable: false, targets: [2, 8, 9, 10, 11] }],
           order: [[0, 'asc']],
         });
 
-        document.getElementById('badge-count').textContent = data.length + ' peserta';
-
-        // Wire custom search to DataTables
+        // Search listener — pasang sekali saja di sini
         document.getElementById('custom-search').addEventListener('input', function() {
           dt.search(this.value).draw();
         });
+      }
+
+      function renderData(data) {
+        dt.clear();
+        dt.rows.add(data.map(rowHtml));
+        dt.draw();
+        document.getElementById('badge-count').textContent = data.length + ' peserta';
       }
 
       function applySearch() {
@@ -524,10 +495,38 @@
           const matchH = !hadir || (r.statusHadir||'').toLowerCase().includes(hadir);
           return matchQ && matchJK && matchH;
         });
-        buildTable(filtered);
+        renderData(filtered);
       }
 
-      loadData();
+      function updateStats() {
+        document.getElementById('stat-total').textContent = rawData.length;
+        document.getElementById('stat-hadir').textContent = rawData.filter(r => (r.statusHadir||'').toLowerCase().includes('hadir')).length;
+        document.getElementById('stat-laki').textContent = rawData.filter(r => (r.jenisKelamin||'').toLowerCase().includes('laki')).length;
+        document.getElementById('stat-perempuan').textContent = rawData.filter(r => (r.jenisKelamin||'').toLowerCase().includes('perempuan')).length;
+      }
+
+      async function loadData() {
+        const btn = document.getElementById('btn-refresh');
+        btn.textContent = '⏳ Memuat…';
+        btn.disabled = true;
+        try {
+          const res = await fetch(API + "?action=listPeserta");
+          const j = await res.json();
+          rawData = j.data || [];
+        } catch(e) {
+          rawData = [];
+        }
+        updateStats();
+        applySearch();
+        btn.textContent = '🔄 Muat Ulang';
+        btn.disabled = false;
+      }
+
+      // Inisialisasi DataTable sekali, lalu load data
+      $(document).ready(function() {
+        initTable();
+        loadData();
+      });
 
       async function hapusPeserta(noKTP) {
         if (!confirm("Yakin ingin menghapus data ini?")) return;
