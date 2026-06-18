@@ -136,66 +136,72 @@ Hapus
 
       let modal;
 
-      function editPeserta(data){
+      function editPeserta(data) {
+        nama.value = data.nama;
+        jk.value = data.jenisKelamin;
+        ktp.value = data.noKTP;
+        tglLahir.value = data.tglLahir;
+        usia.value = data.usia;
+        telp.value = data.noTelp;
 
-          nama.value = data.nama;
-          jk.value = data.jenisKelamin;
-          ktp.value = data.noKTP;
-          tglLahir.value = data.tglLahir;
-          usia.value = data.usia;
-          telp.value = data.noTelp;
-      
-          // Karena KTP adalah primary key, jangan diubah
-          ktp.readOnly = true;
-      
-          new bootstrap.Modal(document.getElementById("editModal")).show();
-      
+        // Karena KTP adalah primary key, jangan diubah
+        ktp.readOnly = true;
+
+        new bootstrap.Modal(document.getElementById("editModal")).show();
       }
 
       async function simpanEdit() {
-        const body = {
+        try {
+          const body = {
             nama: nama.value,
             jenisKelamin: jk.value,
             noKTP: ktp.value,
             tglLahir: tglLahir.value,
             usia: usia.value,
-            noTelp: telp.value
-        };
-        
-        fetch(API + "?action=updatePeserta",{
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
+            noTelp: telp.value,
+          };
+
+          const res = await fetch(API + "?action=updatePeserta", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
             },
-            body:JSON.stringify(body)
-        });
+            body: JSON.stringify(body),
+          });
+
+          const json = await res.json();
+
+          if (json.status === "ok") {
+            alert(json.pesan);
+
+            modal.hide();
+
+            loadData();
+          } else {
+            alert(json.pesan);
+          }
+        } catch (err) {
+          console.error(err);
+
+          alert("Terjadi kesalahan saat menghubungi server.");
+        }
+      }
+
+      async function hapusPeserta(noKTP) {
+        if (!confirm("Yakin ingin menghapus data ini?")) {
+          return;
+        }
+
+        const res = await fetch(
+          API + "?action=hapusPeserta&noKTP=" + encodeURIComponent(noKTP),
+        );
 
         const json = await res.json();
 
         alert(json.pesan);
-
-        modal.hide();
 
         loadData();
       }
-
-      async function hapusPeserta(noKTP){
-
-        if(!confirm("Yakin ingin menghapus data ini?")){
-            return;
-        }
-    
-        const res = await fetch(
-            API + "?action=hapusPeserta&noKTP=" + encodeURIComponent(noKTP)
-        );
-    
-        const json = await res.json();
-    
-        alert(json.pesan);
-    
-        loadData();
-    
-    }
     </script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
