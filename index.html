@@ -549,11 +549,15 @@
         btn.disabled = true;
         try {
           const res = await fetch(API + "?action=listPeserta");
-          const j = await res.json();
-          alert(JSON.stringify(j, null, 2));
           
+          const text = await res.text(); // ambil dulu sebagai teks mentah
+          alert('RAW RESPONSE:\n' + text); // lihat isi aslinya
+          
+          const j = JSON.parse(text); // baru parse manual
           rawData = j.data || [];
+          
         } catch(e) {
+          alert('ERROR: ' + e.message);
           rawData = [];
         }
         updateStats();
