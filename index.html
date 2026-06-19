@@ -548,12 +548,12 @@
         btn.textContent = '⏳ Memuat…';
         btn.disabled = true;
         try {
-          const res = await fetch(API + "?action=listPeserta");
-          
-          const text = await res.text(); // ambil dulu sebagai teks mentah
-          alert('RAW RESPONSE:\n' + text); // lihat isi aslinya
-          
-          const j = JSON.parse(text); // baru parse manual
+          const res = await fetch(API + "?action=listPeserta", {
+            method: 'GET',
+            redirect: 'follow'
+          });
+          const text = await res.text();
+          const j = JSON.parse(text);
           rawData = j.data || [];
           
         } catch(e) {
