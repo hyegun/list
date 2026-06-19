@@ -550,6 +550,8 @@
         try {
           const res = await fetch(API + "?action=listPeserta");
           const j = await res.json();
+          alert(JSON.stringify(j, null, 2));
+          
           rawData = j.data || [];
         } catch(e) {
           rawData = [];
