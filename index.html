@@ -395,56 +395,6 @@
       </div>
     </div>
 
-    <!-- EDIT MODAL (Bootstrap) -->
-    <div class="modal fade" id="editModal" tabindex="-1">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5>✏️ &nbsp;Edit Peserta</h5>
-            <button class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <input type="hidden" id="rowIndex" />
-            <div class="mb-3">
-              <label for="nama" class="form-label">Nama Peserta</label>
-              <input type="text" class="form-control" id="nama" />
-            </div>
-            <div class="row g-3 mb-3">
-              <div class="col-6">
-                <label for="jk" class="form-label">Jenis Kelamin</label>
-                <select class="form-select" id="jk">
-                  <option value="Laki-laki">Laki-laki</option>
-                  <option value="Perempuan">Perempuan</option>
-                </select>
-              </div>
-              <div class="col-6">
-                <label for="usia" class="form-label">Usia</label>
-                <input type="number" class="form-control" id="usia" />
-              </div>
-            </div>
-            <div class="mb-3">
-              <label for="ktp" class="form-label">Nomor KTP (tidak dapat diubah)</label>
-              <input type="text" class="form-control" id="ktp" />
-            </div>
-            <div class="row g-3 mb-3">
-              <div class="col-6">
-                <label for="tglLahir" class="form-label">Tanggal Lahir</label>
-                <input type="date" class="form-control" id="tglLahir" />
-              </div>
-              <div class="col-6">
-                <label for="telp" class="form-label">Nomor Telepon</label>
-                <input type="text" class="form-control" id="telp" />
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal" style="border-radius:8px;font-family:inherit;font-size:12px">Batal</button>
-            <button class="btn btn-primary" onclick="simpanEdit()">💾 &nbsp;Simpan Perubahan</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- QR PREVIEW -->
     <div id="qr-preview-overlay" onclick="closeQR()">
       <div class="qr-preview-box" onclick="event.stopPropagation()">
@@ -533,8 +483,7 @@
           r.noAntri ? `<span class="antri-badge">${r.noAntri}</span>` : '<span style="color:#94a3b8">—</span>',
           r.statusAntri ? `<span style="font-size:11px;color:#64748b">${r.statusAntri}</span>` : '<span style="color:#94a3b8;font-size:11px">—</span>',
           qrHtml,
-          `<button class="btn-act edit" onclick='editPeserta(${JSON.stringify(r)})'>✏️ Edit</button>
-           <button class="btn-act hapus" onclick="hapusPeserta('${r.noKTP}')" style="margin-left:4px">🗑 Hapus</button>`
+          `<button class="btn-act hapus" onclick="hapusPeserta('${r.noKTP}')">🗑 Hapus</button>`
         ];
       }
 
@@ -625,41 +574,6 @@
         initTable();
         loadData();
       });
-
-      let modal;
-
-      function editPeserta(data) {
-        document.getElementById('nama').value = data.nama;
-        document.getElementById('jk').value = data.jenisKelamin;
-        document.getElementById('ktp').value = data.noKTP;
-        document.getElementById('tglLahir').value = data.tglLahir;
-        document.getElementById('usia').value = data.usia;
-        document.getElementById('telp').value = data.noTelp;
-        document.getElementById('ktp').readOnly = true;
-        modal = new bootstrap.Modal(document.getElementById("editModal"));
-        modal.show();
-      }
-
-      async function simpanEdit() {
-        try {
-          const body = {
-            action: "updatePeserta",
-            nama: document.getElementById("nama").value,
-            jenisKelamin: document.getElementById("jk").value,
-            noKTP: document.getElementById("ktp").value,
-            tglLahir: document.getElementById("tglLahir").value,
-            usia: document.getElementById("usia").value,
-            noTelp: document.getElementById("telp").value,
-          };
-          const res = await fetch(API, { method: 'POST', headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-          const json = await res.json();
-          alert(json.pesan);
-          if (json.status === 'ok') { modal.hide(); loadData(); }
-        } catch (err) {
-          console.error(err);
-          alert("Terjadi kesalahan saat menghubungi server.");
-        }
-      }
 
       async function hapusPeserta(noKTP) {
         if (!confirm("Yakin ingin menghapus data ini?")) return;
