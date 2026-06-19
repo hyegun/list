@@ -444,6 +444,7 @@
               <th>Hadir</th>
               <th>Antri</th>
               <th>Status</th>
+              <th>QR</th>
               <th>Aksi</th>
             </tr>
           </thead>
@@ -459,7 +460,7 @@
     <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
 
     <script>
-      const API = "https://script.google.com/macros/s/AKfycbw1YkrVKGvEGQppR-kvV5En-xFRMTlFibZwZ8PiJVi0YhNM9eN6WHD6UrnAJy_LJsnS/exec";
+      const API = "https://script.google.com/macros/s/AKfycbylOYVEZRwqeOWQcDKPjeFgIHDB6Twt4iu-RBugr2BW9frFONyY6n2ij5VqDt3QVb-1/exec";
 
       let rawData = [];
       let dt = null;
@@ -548,16 +549,10 @@
         btn.textContent = '⏳ Memuat…';
         btn.disabled = true;
         try {
-          const res = await fetch(API + "?action=listPeserta", {
-            method: 'GET',
-            redirect: 'follow'
-          });
-          const text = await res.text();
-          const j = JSON.parse(text);
+          const res = await fetch(API + "?action=listPeserta");
+          const j = await res.json();
           rawData = j.data || [];
-          
         } catch(e) {
-          alert('ERROR: ' + e.message);
           rawData = [];
         }
         updateStats();
@@ -583,10 +578,15 @@
 
       async function hapusPeserta(noKTP) {
         if (!confirm("Yakin ingin menghapus data ini?")) return;
-        const res = await fetch(API + "?action=hapusPeserta&noKTP=" + encodeURIComponent(noKTP));
-        const json = await res.json();
-        alert(json.pesan);
-        loadData();
+        try {
+          const res = await fetch(API + "?action=hapusPeserta&noKTP=" + encodeURIComponent(noKTP));
+          const text = await res.text();
+          const json = JSON.parse(text.trim());
+          alert(json.pesan);
+          loadData();
+        } catch(e) {
+          alert('Gagal hapus: ' + e.message);
+        }
       }
     </script>
   </body>
