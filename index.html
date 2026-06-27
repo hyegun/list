@@ -425,6 +425,7 @@
               <th>Antri</th>
               <th>Status</th>
               <th>QR</th>
+              <th>Ibadah</th>
               <th>Aksi</th>
             </tr>
           </thead>
@@ -464,6 +465,7 @@
           r.noAntri ? `<span class="antri-badge">${r.noAntri}</span>` : '<span style="color:#94a3b8">—</span>',
           r.statusAntri ? `<span style="font-size:11px;color:#64748b">${r.statusAntri}</span>` : '<span style="color:#94a3b8;font-size:11px">—</span>',
           qrHtml,
+          r.ibadah,
           `<button class="btn-act hapus" onclick="hapusPeserta('${r.noKTP}')">🗑 Hapus</button>`
         ];
       }
@@ -474,7 +476,7 @@
           columns: [
             { title: 'No' }, { title: 'Nama' }, { title: 'JK' }, { title: 'No KTP' },
             { title: 'Tgl Lahir' }, { title: 'Usia' }, { title: 'Telp' }, { title: 'Tgl Daftar' },
-            { title: 'Hadir' }, { title: 'Antri' }, { title: 'Status' }, { title: 'QR' }, { title: 'Aksi' }
+            { title: 'Hadir' }, { title: 'Antri' }, { title: 'Status' }, { title: 'QR' }, { title: 'ibadah' }, { title: 'Aksi' }
           ],
           pageLength: 10,
           lengthMenu: [10, 25, 50, 100],
@@ -487,7 +489,7 @@
             emptyTable: "Tidak ada data.",
             zeroRecords: "Tidak ada data ditemukan.",
           },
-          columnDefs: [{ orderable: false, targets: [11, 12] }],
+          columnDefs: [{ orderable: false, targets: [11, 13] }],
           order: [[0, 'asc']],
         });
 
