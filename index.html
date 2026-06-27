@@ -425,9 +425,7 @@
               <th>Antri</th>
               <th>Status</th>
               <th>QR</th>
-              <th>Ibadah</th>
               <th>Aksi</th>
-              
             </tr>
           </thead>
           <tbody></tbody>
@@ -466,7 +464,6 @@
           r.noAntri ? `<span class="antri-badge">${r.noAntri}</span>` : '<span style="color:#94a3b8">—</span>',
           r.statusAntri ? `<span style="font-size:11px;color:#64748b">${r.statusAntri}</span>` : '<span style="color:#94a3b8;font-size:11px">—</span>',
           qrHtml,
-          `<span class="ktp-mono">${r.ibadah}</span>`,
           `<button class="btn-act hapus" onclick="hapusPeserta('${r.noKTP}')">🗑 Hapus</button>`
         ];
       }
